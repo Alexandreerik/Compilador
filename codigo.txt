@@ -1,0 +1,8 @@
+program{
+func(int s, int y){
+int k = 4;
+}
+
+int x = 2;
+
+}
