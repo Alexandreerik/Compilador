@@ -1,8 +1,15 @@
 program{
-func(int s, int y){
-int k = 4;
-}
+int x = 0;
+while (x < 5){
+x = x * 3;
 
-int x = 2;
+if(x == 4){
+print (x);
+continue;
+} endif else{
+break;
 
 }
+}
+ 
+}end

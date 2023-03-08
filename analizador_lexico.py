@@ -54,19 +54,19 @@ class Lexer:
             self.tokens.append(token("<chamada de retorno>","return",linha))
             return True
         elif (buffer == "if"):
-            self.tokens.append(token("<condicao>","if",linha))
+            self.tokens.append(token("<chamada do if>","if",linha))
             return True
         elif (buffer == "else"):
-            self.tokens.append(token("<condicao>","else",linha))
+            self.tokens.append(token("<chamada do if>","else",linha))
             return True
         elif (buffer == "while"):
-            self.tokens.append(token("<laco>","while",linha))
+            self.tokens.append(token("<laço>","while",linha))
             return True
         elif (buffer == "break"):
-            self.tokens.append(token("<parar>","break",linha))
+            self.tokens.append(token("<incondicional>","break",linha))
             return True
         elif (buffer == "continue"):
-            self.tokens.append(token("<continuar>","continue",linha))
+            self.tokens.append(token("<incondicional>","continue",linha))
             return True
         elif (buffer == "print"):
             self.tokens.append(token("<chamada de impressão>","printf",linha))
@@ -90,19 +90,19 @@ class Lexer:
             self.tokens.append(token("<booleanas>","<",linha))
             return True
         elif (buffer == "+"):
-            self.tokens.append(token("<aritmeticas>","+",linha))
+            self.tokens.append(token("<operador>","+",linha))
             return True
         elif (buffer == "-"):
-            self.tokens.append(token("<aritmeticas>","-",linha))
+            self.tokens.append(token("<operador>","-",linha))
             return True
         elif (buffer == "*"):
-            self.tokens.append(token("<aritmeticas>","*",linha))
+            self.tokens.append(token("<operador>","*",linha))
             return True
         elif (buffer == "/"):
-            self.tokens.append(token("<aritmeticas>","/",linha))
+            self.tokens.append(token("<operador>","/",linha))
             return True
         elif (buffer == "="):
-            self.tokens.append(token("<atribuicao>","=",linha))
+            self.tokens.append(token("<atribuição>","=",linha))
             return True
         elif (buffer == ","):
             self.tokens.append(token("<virgula>",",",linha))
@@ -138,16 +138,23 @@ class Lexer:
         elif(p == ";"):
             self.tokens.append(token("<fim_comando>",";",linha))
             return True
+        elif(p == "endif"):
+            self.tokens.append(token("<fim_condicao>","endif",linha))
+            return True
+        elif(p == "endwhile"):
+            self.tokens.append(token("<fim_laco>","endwhile",linha))
+            return True
+        elif(p == "endelse"):
+            self.tokens.append(token("<fim_condicao>","endelse",linha))
+            return True
         else:
             return False
 
 
 
     def varivel(self, buffer, linha, texto, i):   
-        #print(buffer)
         if((buffer[0] >= 'a' and buffer[0] <= 'z')):
             for c in buffer:
-                #print(c)
                 if((c >= 'a' and c <= 'z') or (c >= '0' and c <= '9')):
                     continue
                 else:
@@ -171,7 +178,7 @@ class Lexer:
                     
                     while texto[j]!= ")":
                         checkInt = texto[j-2] + texto[j-1] + texto[j]
-                        checkBoolean = texto[j-6] + texto[j-5] + texto[j-4]+ texto[j-3]+ texto[j-2]+ texto[j-1]+ texto[j]
+                        checkBoolean = texto[j-3]+ texto[j-2]+ texto[j-1]+ texto[j]
 
                         if(checkInt == "int"):
                             qtdParam += 1
@@ -191,7 +198,7 @@ class Lexer:
                     
                     while texto[j]!= ")":
                         checkInt = texto[j-2] + texto[j-1] + texto[j]
-                        checkBoolean = texto[j-6] + texto[j-5] + texto[j-4]+ texto[j-3]+ texto[j-2]+ texto[j-1]+ texto[j]
+                        checkBoolean = texto[j-3]+ texto[j-2]+ texto[j-1]+ texto[j]
 
                         if(checkInt == "int"):
                             qtdParam += 1
@@ -211,7 +218,7 @@ class Lexer:
                     
                     while texto[j]!= ")":
                         checkInt = texto[j-2] + texto[j-1] + texto[j]
-                        checkBoolean = texto[j-6] + texto[j-5] + texto[j-4]+ texto[j-3]+ texto[j-2]+ texto[j-1]+ texto[j]
+                        checkBoolean = texto[j-3]+ texto[j-2]+ texto[j-1]+ texto[j]
 
                         if(checkInt == "int"):
                             qtdParam += 1
@@ -223,18 +230,15 @@ class Lexer:
 
                     self.tabela_simbolos[buffer] = SimboloCaracteristica("proc",linha,qtdParam,listParam)
 
+            
+                elif(self.tokens[len(self.tokens) -1].nome == "<abre_parenteses>" or self.tokens[len(self.tokens) -1].nome == "<virgula>"):
+                    print('\033[91m' + "Error variable {0} uninitialized ".format(buffer) + '\033[0m')
+                    quit()
 
-             #   elif(last_token.nome == "<constante>"):
-            #        self.tabela_simbolos[buffer] = Simbolo("const",linha)
-
-            #    elif(self.tokens[len(self.tokens) -1].nome == "<abre_parenteses>" or self.tokens[len(self.tokens) -1].nome == "<virgula>"):
-           #         print('\033[91m' + "Error variable {0} uninitialized ".format(buffer) + '\033[0m')
-            #        quit()
-
-                self.tokens.append(token("<variavel>",buffer,linha))
+                self.tokens.append(token("<identificador>",buffer,linha))
             else:
                 if(self.tokens[len(self.tokens) -1].nome != "<tipo>" and self.tokens[len(self.tokens) -1].nome != "<constante>" and self.tokens[len(self.tokens) -1].nome != "<declaracao_func>") :
-                    self.tokens.append(token("<variavel>",buffer,linha))
+                    self.tokens.append(token("<identificador>",buffer,linha))
                 else:
                     print('\033[91m' + "Error variable {0} already exists ".format(buffer) + '\033[0m')
                     quit()
@@ -252,7 +256,7 @@ class Lexer:
     
             
     
-            
+        
             
     def imprimir_lista_tokens(self):
         for t in self.tokens:
