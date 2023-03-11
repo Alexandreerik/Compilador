@@ -57,7 +57,7 @@ class Lexer:
             self.tokens.append(token("<chamada do if>","if",linha))
             return True
         elif (buffer == "else"):
-            self.tokens.append(token("<chamada do if>","else",linha))
+            self.tokens.append(token("<else_part>","else",linha))
             return True
         elif (buffer == "while"):
             self.tokens.append(token("<laço>","while",linha))
@@ -115,6 +115,7 @@ class Lexer:
             return True
         else:
             self.varivel(buffer, linha , texto, i)
+
     def imprimir_tokens(self):
         for t in self.tokens:
             print(t.nome + " " + t.lexema + " " + str(t.linha))
@@ -141,6 +142,9 @@ class Lexer:
         elif(p == "endif"):
             self.tokens.append(token("<fim_condicao>","endif",linha))
             return True
+        elif(p == "endelse"):
+            self.tokens.append(token("<fim_condicao>","endif",linha))
+            return True
         elif(p == "endwhile"):
             self.tokens.append(token("<fim_laco>","endwhile",linha))
             return True
@@ -162,34 +166,51 @@ class Lexer:
                     quit()
 
             last_token = self.tokens[len(self.tokens) -1] #pega o ultimo token adicionado
+            pre_last_token = self.tokens[len(self.tokens) -2] #pega o penultimo token adicionado
             if(buffer not in self.tabela_simbolos): ##### VERIFICA SE A VARIAVEL JÁ EXISTE NA LISTA
-                if(last_token.nome == "<tipo>"): #adicionando na tabela de simbolos
+                
+                if(last_token.nome == "<tipo>" and pre_last_token.nome != '<declaração de função>'): #adicionando na tabela de simbolos
                         if(last_token.lexema == "int"):
                             self.tabela_simbolos[buffer] = Simbolo("int",linha)
                         
                         elif(last_token.lexema == "bool"):
                             self.tabela_simbolos[buffer] = Simbolo("bool",linha)
                         
-
-                elif(last_token.lexema == "func"):
+            
+                elif(pre_last_token.lexema == "func"):
                     j = i
                     listParam = []
                     qtdParam = 0
-                    
-                    while texto[j]!= ")":
-                        checkInt = texto[j-2] + texto[j-1] + texto[j]
-                        checkBoolean = texto[j-3]+ texto[j-2]+ texto[j-1]+ texto[j]
+                    if(last_token.lexema == "int"):
+                        while texto[j]!= ")":
+                            checkInt = texto[j-2] + texto[j-1] + texto[j]
+                            checkBoolean = texto[j-3]+ texto[j-2]+ texto[j-1]+ texto[j]
 
-                        if(checkInt == "int"):
-                            qtdParam += 1
-                            listParam.append("int")
-                        elif(checkBoolean == "bool"):
-                            qtdParam += 1
-                            listParam.append("bool")
-                        j += 1
+                            if(checkInt == "int"):
+                                qtdParam += 1
+                                listParam.append("int")
+                            elif(checkBoolean == "bool"):
+                                qtdParam += 1
+                                listParam.append("bool")
+                            j += 1
 
-                   
-                    self.tabela_simbolos[buffer] = SimboloCaracteristica("func",linha,qtdParam,listParam)
+                        
+                        self.tabela_simbolos[buffer] = SimboloFuncao("func","int",linha,qtdParam,listParam)
+                    elif(last_token.lexema == "bool"):
+                        while texto[j]!= ")":
+                            checkInt = texto[j-2] + texto[j-1] + texto[j]
+                            checkBoolean = texto[j-3]+ texto[j-2]+ texto[j-1]+ texto[j]
+
+                            if(checkInt == "int"):
+                                qtdParam += 1
+                                listParam.append("int")
+                            elif(checkBoolean == "bool"):
+                                qtdParam += 1
+                                listParam.append("bool")
+                            j += 1
+
+                        
+                        self.tabela_simbolos[buffer] = SimboloFuncao("func","bool",linha,qtdParam,listParam)
 
                 elif(last_token.lexema == "callfunc"):
                     j = i
@@ -267,5 +288,7 @@ class Lexer:
         for t in self.tabela_simbolos:
             if type(self.tabela_simbolos[t]) is Simbolo:
                 print(self.tabela_simbolos[t].tipo + " " + t + " " + str(self.tabela_simbolos[t].linha))
-            else:
+            elif type(self.tabela_simbolos[t]) is SimboloCaracteristica:
                 print(self.tabela_simbolos[t].tipo + " " + t + " " + str(self.tabela_simbolos[t].linha) + " " + str(self.tabela_simbolos[t].qtdParam) + " " + str(self.tabela_simbolos[t].listParam))
+            elif type(self.tabela_simbolos[t]) is SimboloFuncao:
+                print(self.tabela_simbolos[t].tipo + " " +str(self.tabela_simbolos[t].tipoRetorno) + " " + t + " "  + str(self.tabela_simbolos[t].linha) + " " + str(self.tabela_simbolos[t].qtdParam) + " " + str(self.tabela_simbolos[t].listParam))
