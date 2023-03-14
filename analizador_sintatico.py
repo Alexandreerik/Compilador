@@ -10,7 +10,7 @@ class AnalizadorSintatico:
      def match(self, token_esperado):
         if self.lista_tokens[self.look_ahead].nome == token_esperado:
             self.look_ahead += 1
-            #print ("Token esperado: " + token_esperado + " encontrado: " + self.lista_tokens[self.look_ahead-1].nome + " na linha: " + str(self.lista_tokens[self.look_ahead-1].linha))
+            print ("Token esperado: " + token_esperado + " encontrado: " + self.lista_tokens[self.look_ahead-1].nome + " na linha: " + str(self.lista_tokens[self.look_ahead-1].linha))
         else:
             print("Erro sintático: token esperado: " + token_esperado + " encontrado: " + self.lista_tokens[self.look_ahead].nome + " na linha: " + str(self.lista_tokens[self.look_ahead].linha))
             exit()
@@ -20,44 +20,39 @@ class AnalizadorSintatico:
         self.match("<abre_chaves>")
         self.bloco()
         self.match("<fecha_chaves>")
-
+        self.match("<Fimprograma>")
         
      def bloco(self):
         token_atual = self.lista_tokens[self.look_ahead]
         if token_atual.nome == "<tipo>":
             self.declaracao_variavel()
             self.bloco()
-        elif token_atual.nome == "<atribuição>":
-            self.atribuicao()
-            
         elif token_atual.nome == "<declaração de função>":
             self.declaracao_funcao()
             self.bloco()
-        elif token_atual.nome == "<laço>":
-            self.laço()
-            self.bloco()
-        elif token_atual.nome == "<chamada do if>":
-            self.condicao()
+        elif token_atual.nome == "<declaração de procedimento>":
+            self.declaracao_procedimento()
             self.bloco()
         elif token_atual.nome == "<chamada de função>":
             self.chamada_funcao()
             self.bloco()
+        elif token_atual.nome == "<chamada de procedimento>":
+            self.chamada_procedimento()
+            self.bloco()
         elif token_atual.nome == "<chamada de impressão>":
             self.chamada_impressao()
             self.bloco()
-        
+        elif token_atual.nome == "<chamada do if>":
+            self.condicao()
+            self.bloco()
+        elif token_atual.nome == "<laço>":
+            self.laço()
+            self.bloco()
         elif token_atual.nome == "<identificador>":
             self.match("<identificador>")
             self.match("<atribuição>")
             self.atribuicao()
             self.bloco()             
-        elif token_atual.nome == "<declaração de procedimento>":
-            self.declaracao_procedimento()
-            self.bloco()
-
-        elif token_atual.nome == "<chamada de procedimento>":
-            self.chamada_procedimento()
-            self.bloco()
         else:
             return     
 
@@ -75,7 +70,7 @@ class AnalizadorSintatico:
         self.match("<chamada de procedimento>")
         self.match("<identificador>")
         self.match("<abre_parenteses>")
-        self.parametros()
+        self.chamada_parametros()
         self.match("<fecha_parenteses>")
         self.match("<fim_comando>")
 
@@ -84,32 +79,38 @@ class AnalizadorSintatico:
             self.match("<palavraBooleana>")
             return
         else:
-            self.match("<identificador>")
-            self.match("<booleanas>")
             if self.lista_tokens[self.look_ahead].nome == "<identificador>":
                 self.match("<identificador>")
+                self.match("<booleanas>")
+                self.expressao2()
             elif self.lista_tokens[self.look_ahead].nome == "<número>":
                 self.match("<número>")
-            elif self.lista_tokens[self.look_ahead].nome == "<booleano>":
-                self.match("<booleano>")
-    
+                self.match("<booleanas>")
+                self.expressao2()
+            
+     def expressao2(self):
+        if self.lista_tokens[self.look_ahead].nome == "<identificador>":
+            self.match("<identificador>")
+        elif self.lista_tokens[self.look_ahead].nome == "<número>":
+            self.match("<número>")
         
         
      def atribuicao(self):
         if self.lista_tokens[self.look_ahead+1].nome == "<operador>":
             self.chamada_operador()
+            self.match("<fim_comando>")
         elif self.lista_tokens[self.look_ahead].nome == "<identificador>":
             self.match("<identificador>")
+            self.match("<fim_comando>")
         elif self.lista_tokens[self.look_ahead].nome == "<número>":
             self.match("<número>")
+            self.match("<fim_comando>")
         elif self.lista_tokens[self.look_ahead].nome == "<chamada de função>":
             self.chamada_funcao()
-        elif self.lista_tokens[self.look_ahead].nome == "<booleano>":
-            self.match("<booleano>")
-        
-        if self.lista_tokens[self.look_ahead].nome == "<fim_comando>":
+        elif self.lista_tokens[self.look_ahead].nome == "<palavraBooleana>":
+            self.match("<palavraBooleana>")
             self.match("<fim_comando>")
-            self.bloco()
+            
 
 
      def chamada_operador(self):
@@ -142,8 +143,8 @@ class AnalizadorSintatico:
             self.match("<identificador>")
         elif self.lista_tokens[self.look_ahead].nome == "<numero>":
             self.match("<numero>")
-        elif self.lista_tokens[self.look_ahead].nome == "<booleano>":
-            self.match("<booleano>")
+        elif self.lista_tokens[self.look_ahead].nome == "<palavraBooleana>":
+            self.match("<palavraBooleana>")
         self.match("<fecha_parenteses>")
         self.match("<fim_comando>")
 
@@ -151,12 +152,16 @@ class AnalizadorSintatico:
      def chamada_impressao(self):
         self.match("<chamada de impressão>")
         self.match("<abre_parenteses>")
-        if(self.lista_tokens[self.look_ahead].nome == "<identificador>"):
+        if (self.lista_tokens[self.look_ahead+1].nome == "<operador>"):
+            self.chamada_operador()
+        elif(self.lista_tokens[self.look_ahead].nome == "<identificador>"):
             self.match("<identificador>")
         elif(self.lista_tokens[self.look_ahead].nome == "<numero>"):
             self.match("<numero>")
         elif(self.lista_tokens[self.look_ahead].nome == "<chamada de função>"):
             self.chamada_funcao()
+        elif(self.lista_tokens[self.look_ahead].nome == "<palavraBooleana>"):
+            self.match("<palavraBooleana>")
         self.match("<fecha_parenteses>")
         self.match("<fim_comando>")
             
@@ -174,7 +179,6 @@ class AnalizadorSintatico:
         self.match("<fecha_chaves>")
      
      def declaracao_funcao(self):
-        
         self.match("<declaração de função>")
         self.match("<tipo>")
         self.match("<identificador>")
@@ -190,10 +194,32 @@ class AnalizadorSintatico:
         self.match("<chamada de função>")
         self.match("<identificador>")
         self.match("<abre_parenteses>")
-        self.parametros()
+        self.chamada_parametros()
         self.match("<fecha_parenteses>")
-        if self.lista_tokens[self.look_ahead].nome == "<fim_comando>":
-            self.match("<fim_comando>")
+        self.match("<fim_comando>")
+     
+     def parametros(self):
+        token_atual = self.lista_tokens[self.look_ahead]
+
+        if token_atual.nome == "<tipo>":
+            self.match("<tipo>")
+            self.match("<identificador>")
+            self.parametros()
+
+        elif token_atual.nome == "<virgula>":
+            self.match("<virgula>")            
+            self.match("<tipo>")
+            self.match("<identificador>")
+            self.parametros()
+        
+
+
+     def chamada_parametros(self):
+        if self.lista_tokens[self.look_ahead].nome == "<identificador>":
+            self.match("<identificador>")
+            if self.lista_tokens[self.look_ahead].nome == "<virgula>":
+                self.match("<virgula>")
+                self.chamada_parametros()
 
      def condicao(self):
         self.match("<chamada do if>")
@@ -203,14 +229,13 @@ class AnalizadorSintatico:
         self.match("<abre_chaves>")
         self.bloco3()
         self.match("<fecha_chaves>")
-        self.match("<fim_condicao>")
-        
-        self.match("<else_part>")
-        self.match("<abre_chaves>")
-        self.bloco3()
-        self.match("<fecha_chaves>")
-        if self.lista_tokens[self.look_ahead].nome == "<fim_condicao>":
-            self.match("<fim_condicao>")
+        self.match("<fim_if>")
+        if self.lista_tokens[self.look_ahead].nome == "<else_part>":
+            self.match("<else_part>")
+            self.match("<abre_chaves>")
+            self.bloco3()
+            self.match("<fecha_chaves>")
+            self.match("<fim_else>")
     
 
      def declaracao_variavel(self):
@@ -221,35 +246,6 @@ class AnalizadorSintatico:
             self.atribuicao()
         if self.lista_tokens[self.look_ahead].nome == "<fim_comando>":
             self.match("<fim_comando>")
-        
-
-     def parametros(self):
-        token_atual = self.lista_tokens[self.look_ahead]
-
-        if token_atual.nome == "<tipo>":
-            self.match("<tipo>")
-            self.match("<identificador>")
-            self.parametros()
-
-        elif token_atual.nome == "<virgula>":
-            self.match("<virgula>")
-            if(self.lista_tokens[self.look_ahead].nome == "<tipo>"):
-                self.match("<tipo>")
-                self.match("<identificador>")
-            self.parametros()
-
-        elif token_atual.nome == "<variavel>":
-            self.match("<variavel>")
-            self.parametros()
-        elif token_atual.nome == "<numero>":
-            self.match("<numero>")
-            self.parametros()
-        elif token_atual.nome == "<bool>":
-            self.match("<bool>")
-            self.parametros()
-        elif token_atual.nome == "<identificador>":
-            self.match("<identificador>")
-            self.parametros()
 
 
      def bloco2(self):
@@ -262,8 +258,6 @@ class AnalizadorSintatico:
         elif self.lista_tokens[self.look_ahead].nome == "<laço>":
             self.laço()
             self.bloco2()
-        elif self.lista_tokens[self.look_ahead].nome == "<atribuição>":
-            self.atribuicao2()
         elif self.lista_tokens[self.look_ahead].nome == "<chamada de função>":
             self.chamada_funcao()
             self.bloco2()
@@ -273,20 +267,17 @@ class AnalizadorSintatico:
         elif self.lista_tokens[self.look_ahead].nome == "<identificador>":
             self.match("<identificador>")
             self.match("<atribuição>")
-            self.atribuicao2()
+            self.atribuicao()
             self.bloco2()    
         elif self.lista_tokens[self.look_ahead].nome == "<chamada de procedimento>":
             self.chamada_procedimento()
             self.bloco2()
         elif self.lista_tokens[self.look_ahead].nome == "<incondicional>":
             self.match("<incondicional>")
-            self.bloco2()
-        elif self.lista_tokens[self.look_ahead].nome == "<fim_comando>":
             self.match("<fim_comando>")
             self.bloco2()
-        elif self.lista_tokens[self.look_ahead].nome == "<fecha_chaves>":
-            
-            return
+        
+        
         
   
      def condicao2(self):
@@ -297,30 +288,14 @@ class AnalizadorSintatico:
         self.match("<abre_chaves>")
         self.bloco2()
         self.match("<fecha_chaves>")
-        self.match("<fim_condicao>")
-        
-        self.match("<else_part>")
-        self.match("<abre_chaves>")
-        self.bloco2()
-        self.match("<fecha_chaves>")
-        if self.lista_tokens[self.look_ahead].nome == "<fim_condicao>":
-            self.match("<fim_condicao>")
-        
-     def atribuicao2(self):
-        if self.lista_tokens[self.look_ahead+1].nome == "<operador>":
-            self.chamada_operador()
-        elif self.lista_tokens[self.look_ahead].nome == "<identificador>":
-            self.match("<identificador>")
-        elif self.lista_tokens[self.look_ahead].nome == "<número>":
-            self.match("<número>")
-        elif self.lista_tokens[self.look_ahead].nome == "<chamada de função>":
-            self.chamada_funcao()
-        elif self.lista_tokens[self.look_ahead].nome == "<booleano>":
-            self.match("<booleano>")
-        
-        if self.lista_tokens[self.look_ahead].nome == "<fim_comando>":
-            self.match("<fim_comando>")
+        self.match("<fim_if>")
+        if self.lista_tokens[self.look_ahead].nome == "<else_part>":
+            self.match("<else_part>")
+            self.match("<abre_chaves>")
             self.bloco2()
+            self.match("<fecha_chaves>")
+            self.match("<fim_else>")
+        
 
 
      def bloco3(self):
@@ -337,7 +312,7 @@ class AnalizadorSintatico:
          elif self.lista_tokens[self.look_ahead].nome == "<identificador>":
             self.match("<identificador>")
             self.match("<atribuição>")
-            self.atribuicao2()
+            self.atribuicao()
             self.bloco3()    
          elif self.lista_tokens[self.look_ahead].nome == "<chamada do if>":
             self.condicao2()

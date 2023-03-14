@@ -140,16 +140,13 @@ class Lexer:
             self.tokens.append(token("<fim_comando>",";",linha))
             return True
         elif(p == "endif"):
-            self.tokens.append(token("<fim_condicao>","endif",linha))
+            self.tokens.append(token("<fim_if>","endif",linha))
             return True
         elif(p == "endelse"):
-            self.tokens.append(token("<fim_condicao>","endif",linha))
+            self.tokens.append(token("<fim_else>","endif",linha))
             return True
         elif(p == "endwhile"):
             self.tokens.append(token("<fim_laco>","endwhile",linha))
-            return True
-        elif(p == "endelse"):
-            self.tokens.append(token("<fim_condicao>","endelse",linha))
             return True
         else:
             return False
@@ -274,10 +271,7 @@ class Lexer:
                     return False
             self.tokens.append(token("<número>",buffer,linha))
 
-    
-            
-    
-        
+      
             
     def imprimir_lista_tokens(self):
         for t in self.tokens:
