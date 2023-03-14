@@ -69,25 +69,25 @@ class Lexer:
             self.tokens.append(token("<incondicional>","continue",linha))
             return True
         elif (buffer == "print"):
-            self.tokens.append(token("<chamada de impressão>","printf",linha))
+            self.tokens.append(token("<chamada de impressão>","print",linha))
             return True
         elif (buffer == "=="):
-            self.tokens.append(token("<booleanas>","==",linha))
+            self.tokens.append(token("<operador booleano>","==",linha))
             return True
         elif (buffer == "!="):
-            self.tokens.append(token("<booleanas>","!=",linha))
+            self.tokens.append(token("<operador booleano>","!=",linha))
             return True
         elif (buffer == "<="):
-            self.tokens.append(token("<booleanas>","<=",linha))
+            self.tokens.append(token("<operador booleano>","<=",linha))
             return True
         elif (buffer == ">="):
-            self.tokens.append(token("<booleanas>",">=",linha))
+            self.tokens.append(token("<operador booleano>",">=",linha))
             return True
         elif (buffer == ">"):
-            self.tokens.append(token("<booleanas>",">",linha))
+            self.tokens.append(token("<operador booleano>",">",linha))
             return True
         elif (buffer == "<"):
-            self.tokens.append(token("<booleanas>","<",linha))
+            self.tokens.append(token("<operador booleano>","<",linha))
             return True
         elif (buffer == "+"):
             self.tokens.append(token("<operador>","+",linha))
@@ -116,9 +116,7 @@ class Lexer:
         else:
             self.varivel(buffer, linha , texto, i)
 
-    def imprimir_tokens(self):
-        for t in self.tokens:
-            print(t.nome + " " + t.lexema + " " + str(t.linha))
+
             
 
     def verifica_delimitadores(self, p, linha):
@@ -162,11 +160,11 @@ class Lexer:
                     print("Erro de variavel na linha: " + str(linha))
                     quit()
 
-            last_token = self.tokens[len(self.tokens) -1] #pega o ultimo token adicionado
-            pre_last_token = self.tokens[len(self.tokens) -2] #pega o penultimo token adicionado
-            if(buffer not in self.tabela_simbolos): ##### VERIFICA SE A VARIAVEL JÁ EXISTE NA LISTA
+            last_token = self.tokens[len(self.tokens) -1] 
+            pre_last_token = self.tokens[len(self.tokens) -2] 
+            if(buffer not in self.tabela_simbolos): 
                 
-                if(last_token.nome == "<tipo>" and pre_last_token.nome != '<declaração de função>'): #adicionando na tabela de simbolos
+                if(last_token.nome == "<tipo>" and pre_last_token.nome != '<declaração de função>'): 
                         if(last_token.lexema == "int"):
                             self.tabela_simbolos[buffer] = Simbolo("int",linha)
                         
@@ -209,25 +207,7 @@ class Lexer:
                         
                         self.tabela_simbolos[buffer] = SimboloFuncao("func","bool",linha,qtdParam,listParam)
 
-                elif(last_token.lexema == "callfunc"):
-                    j = i
-                    listParam = []
-                    qtdParam = 0
-                    
-                    while texto[j]!= ")":
-                        checkInt = texto[j-2] + texto[j-1] + texto[j]
-                        checkBoolean = texto[j-3]+ texto[j-2]+ texto[j-1]+ texto[j]
-
-                        if(checkInt == "int"):
-                            qtdParam += 1
-                            listParam.append("int")
-                        elif(checkBoolean == "bool"):
-                            qtdParam += 1
-                            listParam.append("bool")
-                        j += 1
-
-                    
-                    self.tabela_simbolos[buffer] = SimboloCaracteristica("callfunc",linha,qtdParam,listParam)
+                
 
                 elif(last_token.lexema == "proc"):
                     j = i
@@ -250,35 +230,32 @@ class Lexer:
 
             
                 elif(self.tokens[len(self.tokens) -1].nome == "<abre_parenteses>" or self.tokens[len(self.tokens) -1].nome == "<virgula>"):
-                    print('\033[91m' + "Error variable {0} uninitialized ".format(buffer) + '\033[0m')
+                    print('\033[91m' + "Erro variavel {0} não inicializada ".format(buffer) + '\033[0m')
                     quit()
 
                 self.tokens.append(token("<identificador>",buffer,linha))
             else:
-                if(self.tokens[len(self.tokens) -1].nome != "<tipo>" and self.tokens[len(self.tokens) -1].nome != "<constante>" and self.tokens[len(self.tokens) -1].nome != "<declaracao_func>") :
+                if(self.tokens[len(self.tokens) -1].nome != "<tipo>" and self.tokens[len(self.tokens) -1].nome != "<declaração de procedimento>" and self.tokens[len(self.tokens) -2].nome != "<declaração de função>") :
                     self.tokens.append(token("<identificador>",buffer,linha))
                 else:
-                    print('\033[91m' + "Error variable {0} already exists ".format(buffer) + '\033[0m')
+                    print('\033[91m' + "Erro variavel {0} já existe ".format(buffer) + '\033[0m')
                     quit()
         else:
             for c in buffer:
-                 #print(c)
                  if(c >= '0' and c <= '9'):
                      continue
                  else:
-                    print('\033[91m' + "Error line: " + str(linha) + '\033[0m')
+                    print('\033[91m' + "Erro na linha: " + str(linha) + '\033[0m')
                     quit()
                     return False
             self.tokens.append(token("<número>",buffer,linha))
-
-      
             
     def imprimir_lista_tokens(self):
         for t in self.tokens:
             print(t.nome + " " + t.lexema + " " + str(t.linha))
     
     def imprimir_tabela_simbolos(self):
-        print('\033[34m' + "SIMBOLOS" + '\033[0m')
+        print("SIMBOLOS")
         for t in self.tabela_simbolos:
             if type(self.tabela_simbolos[t]) is Simbolo:
                 print(self.tabela_simbolos[t].tipo + " " + t + " " + str(self.tabela_simbolos[t].linha))
