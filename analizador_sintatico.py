@@ -10,7 +10,7 @@ class AnalizadorSintatico:
      def match(self, token_esperado):
         if self.lista_tokens[self.look_ahead].nome == token_esperado:
             self.look_ahead += 1
-            print ("Token esperado: " + token_esperado + " encontrado: " + self.lista_tokens[self.look_ahead-1].nome + " na linha: " + str(self.lista_tokens[self.look_ahead-1].linha))
+           # print ("Token esperado: " + token_esperado + " encontrado: " + self.lista_tokens[self.look_ahead-1].nome + " na linha: " + str(self.lista_tokens[self.look_ahead-1].linha))
         else:
             print("Erro sintático: token esperado: " + token_esperado + " encontrado: " + self.lista_tokens[self.look_ahead].nome + " na linha: " + str(self.lista_tokens[self.look_ahead].linha))
             exit()
@@ -32,10 +32,6 @@ class AnalizadorSintatico:
             self.bloco()
         elif token_atual.nome == "<declaração de procedimento>":
             self.declaracao_procedimento()
-            self.bloco()
-        elif token_atual.nome == "<chamada de função>":
-            self.chamada_funcao()
-            self.match("<fim_comando>")
             self.bloco()
         elif token_atual.nome == "<chamada de procedimento>":
             self.chamada_procedimento()
@@ -95,6 +91,9 @@ class AnalizadorSintatico:
                 self.match("<número>")
                 self.match("<operador booleano>")
                 self.expressao2()
+            else:
+                print("Erro sintático: token esperado: <identificador>" + " ou " + "<número>" + " encontrado: " + self.lista_tokens[self.look_ahead].nome + " na linha: " + str(self.lista_tokens[self.look_ahead].linha))
+                exit()
             
      def expressao2(self):
         if self.lista_tokens[self.look_ahead].nome == "<identificador>":
@@ -158,8 +157,8 @@ class AnalizadorSintatico:
         self.match("<abre_parenteses>")
         if self.lista_tokens[self.look_ahead].nome == "<identificador>":
             self.match("<identificador>")
-        elif self.lista_tokens[self.look_ahead].nome == "<numero>":
-            self.match("<numero>")
+        elif self.lista_tokens[self.look_ahead].nome == "<número>":
+            self.match("<número>")
         elif self.lista_tokens[self.look_ahead].nome == "<palavraBooleana>":
             self.match("<palavraBooleana>")
         elif self.lista_tokens[self.look_ahead].nome == "<chamada de função>":
@@ -265,10 +264,6 @@ class AnalizadorSintatico:
         elif self.lista_tokens[self.look_ahead].nome == "<laço>":
             self.laço()
             self.bloco2()
-        elif self.lista_tokens[self.look_ahead].nome == "<chamada de função>":
-            self.chamada_funcao()
-            self.match("<fim_comando>")
-            self.bloco2()
         elif self.lista_tokens[self.look_ahead].nome == "<chamada de impressão>":
             self.chamada_impressao()
             self.bloco2()
@@ -307,16 +302,11 @@ class AnalizadorSintatico:
 
 
      def bloco3(self):
-         print("entrou no bloco3")
          if self.lista_tokens[self.look_ahead].nome == "<declaração de variável>":  
             self.declaracao_variavel()
             self.bloco3()
          elif self.lista_tokens[self.look_ahead].nome == "<chamada de procedimento>":
              self.chamada_procedimento()
-             self.bloco3()
-         elif self.lista_tokens[self.look_ahead].nome == "<chamada de função>":
-             self.chamada_funcao()
-             self.match("<fim_comando>")
              self.bloco3()
          elif self.lista_tokens[self.look_ahead].nome == "<identificador>":
             self.match("<identificador>")

@@ -1,20 +1,25 @@
 program{
+
+proc somador (int a, int b){
+    print(a);
+
+}
+
 func int soma (int i, int j) {
     int k = i + j ;
     if( j > i ){
-        print(k);
+        print(true);
 
     }endif
     i = j * k;
-    return ( i );
+    return ( 3 );
 }
 
 
-int x = 1 + 5 / 4 * 2;
+int x = 1 + 5 / 4 * 2 - 10;
 int y = 5;
 int z = callfunc soma (x , y , i , j);
 bool boleano = true;
-print (callfunc soma(z, y));
 
 while (x < 100){
     while (x < 5){
@@ -24,13 +29,9 @@ while (x < 100){
             break;
         }endif else{
             continue;
-    } endelse
+        } endelse
   }endwhile
 } endwhile
-
-proc somador (int a, int b){
-    print(a);
-}
 
 callproc somador (x);
 
