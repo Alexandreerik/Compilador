@@ -1,0 +1,49 @@
+
+proc somador:
+begin_proc:
+
+print(a)
+
+func soma:
+begin_func:
+
+_t0 = i + j
+k = _t0
+
+ifFalse j>i goto: L1
+
+print(i)
+
+
+_t0 = j * k
+i = _t0
+
+return 3
+
+ts = true 
+
+_t0 = 1 + 5
+_t1 = _t0 / 4
+_t2 = _t1 * 2
+x = _t2
+
+y = 10 
+
+_param = y 
+_param = x 
+z = call soma,2
+
+boleano = true 
+
+L2:
+whileFalse x<100 goto: L3
+
+L3:
+whileFalse x<10 goto: L4
+
+_t0 = x * 3
+x = _t0
+
+print(x)
+
+
