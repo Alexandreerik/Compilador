@@ -4,6 +4,8 @@ begin_proc:
 
 print(a)
 
+end_proc
+
 func soma:
 begin_func:
 
@@ -19,6 +21,8 @@ _t0 = j * k
 i = _t0
 
 return 3
+
+end_func
 
 ts = true 
 

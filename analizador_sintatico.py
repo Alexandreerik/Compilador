@@ -83,6 +83,8 @@ class AnalizadorSintatico:
         self.match("<abre_chaves>")
         self.bloco()
         self.match("<fecha_chaves>")
+        endProc = [token("<end_proc>","<end_proc>",0), token("<end_proc>","endProc",0)]
+        self.instrucoes.append(endProc)
 
      def chamada_procedimento(self):
         self.match("<chamada de procedimento>")
@@ -203,6 +205,8 @@ class AnalizadorSintatico:
             exit()
         self.match("<fecha_parenteses>")
         self.match("<fim_comando>")
+        end = [token("<end_func>","<end_func>",0), token("<end_func>","end_func",0)]
+        self.instrucoes.append(end)
 
 
      def chamada_impressao(self):
