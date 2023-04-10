@@ -7,8 +7,6 @@ class GeradorCodigoIntermediario:
         self.lastLabelWhile = []
         self.labelsElse = []
         
-
-
     def imprimirListainstrucoes(self):
         for i in range(len(self.lista_instrucoes)):
             for j in range(len(self.lista_instrucoes[i])):
@@ -23,10 +21,9 @@ class GeradorCodigoIntermediario:
             arq.write("\n")
             if(self.lista_instrucoes[i][1].nome) == "<atribuição>": 
                 self.gerador_attr(self.lista_instrucoes[i], arq)
-            elif(self.lista_instrucoes[i][0].nome) == "<chamada do if>": 
+            elif(self.lista_instrucoes[i][0].nome) == "<chamada do if>" or self.lista_instrucoes[i][0].nome == "<else_part>" or self.lista_instrucoes[i][0].nome == "<fim_if>" or self.lista_instrucoes[i][0].nome == "<fim_else>": 
                 self.gerador_if(self.lista_instrucoes[i], arq)
-            elif(self.lista_instrucoes[i][0].nome) == "<laço>" or self.lista_instrucoes[i][0].nome == "<fecha_chaves>":
-                
+            elif(self.lista_instrucoes[i][0].nome) == "<laço>" or self.lista_instrucoes[i][1].nome == "<fecha_chaves>" or self.lista_instrucoes[i][0].nome == "<incondicional>":
                 self.gerador_while(self.lista_instrucoes[i], arq)
             elif(self.lista_instrucoes[i][0].nome) == "<chamada de impressão>":
                  arq.write("print({0})".format(self.lista_instrucoes[i][2].lexema) + "\n")
@@ -34,23 +31,33 @@ class GeradorCodigoIntermediario:
                 arq.write("{0} {1}".format(self.lista_instrucoes[i][0].lexema, self.lista_instrucoes[i][1].lexema) + "\n")
             elif(self.lista_instrucoes[i][0].nome == "<declaração de procedimento>"):
                 self.gerador_proc(self.lista_instrucoes[i], arq)
+            elif(self.lista_instrucoes[i][0].nome) == "<chamada de procedimento>":
+                self.gerador_chamada_proc(self.lista_instrucoes[i], arq)
             elif(self.lista_instrucoes[i][0].nome) == "<declaração de função>":
                 self.gerador_func(self.lista_instrucoes[i], arq)
-
             elif(self.lista_instrucoes[i][0].nome) == "<end_func>":
                 arq.write("end_func" + "\n")
-
             elif(self.lista_instrucoes[i][0].nome) == "<end_proc>":
                 arq.write("end_proc" + "\n")
 
+    def gerador_chamada_proc(self, instrucao, arq):
+        contParam = 0
+        i = 2
+        if len(instrucao) > 3:
+            while(instrucao[i + 1].nome != "<fecha_parenteses>"):
+                i += 1
+            while(instrucao[i].nome != "<abre_parenteses>"):
+                if instrucao[i].lexema != ",":
+                    arq.write("_param = {0} ".format(instrucao[i].lexema) + "\n")
+                    contParam += 1
+                i -= 1
+        arq.write("call {0},{1}".format(instrucao[1].lexema, contParam) + "\n")
 
     def gerador_attr(self, instrucao, arq):
         if(len(instrucao) == 3):
             
             for item in instrucao:
-                print(item.lexema,end=" ")
                 arq.write(item.lexema + " ")
-            print("")
             arq.write("\n")
         else:
             
@@ -62,7 +69,6 @@ class GeradorCodigoIntermediario:
                         i += 1
                     while(instrucao[i].nome != "<abre_parenteses>"):
                         if instrucao[i].lexema != ",":
-                            print("_param = {0} ".format(instrucao[i].lexema))
                             arq.write("_param = {0} ".format(instrucao[i].lexema) + "\n")
                             contParam += 1
                         i -= 1
@@ -94,7 +100,6 @@ class GeradorCodigoIntermediario:
             arq.write("ifFalse ")
 
             for item in listAux:
-                print(item.lexema, end="")
                 arq.write(item.lexema + "")
 
             if len(self.lastLabelWhile) != 0:
@@ -102,7 +107,11 @@ class GeradorCodigoIntermediario:
             arq.write(" goto: L{0}".format(self.labels) + "\n")
             
             self.labelsElse.append(self.labels)
-
+        elif(instrucao[0].lexema == "else"):
+            pop = self.labelsElse.pop()
+            arq.write("goto: L{0}".format(self.labels + 1) + "\n")
+            arq.write("L{0}:".format(pop) + "\n")
+            self.labelsElse.append(self.labels + 1)
         else:
             
             pop = self.labelsElse.pop()
@@ -116,26 +125,28 @@ class GeradorCodigoIntermediario:
                 if item.lexema not in ["while","(",")"]:
                     listAux.append(item)
 
-
             self.labels += 1
             self.lastLabelWhile.append(self.labels)
             arq.write("L{0}:".format(self.labels) + "\n")
             arq.write("whileFalse ")
-            for item in listAux:
-                print(item.lexema, end="")
+            for item in listAux: 
                 arq.write(item.lexema + "")
-
             arq.write(" goto: L{0}".format(self.labels + 1) + "\n")
-
+        elif(instrucao[0].lexema == "break"):
+            pop = self.lastLabelWhile.pop()
+            arq.write("goto: L{0}".format(pop + 1) + "\n")
+            self.lastLabelWhile.append(pop)
+        elif(instrucao[0].lexema == "continue"):
+            pop = self.lastLabelWhile.pop()
+            arq.write("goto: L{0}".format(pop) + "\n")
+            self.lastLabelWhile.append(pop)
         else:
             pop = self.lastLabelWhile.pop()
             arq.write("goto: L{0}".format(pop) + "\n")
             arq.write("L{0}:".format(pop + 1) + "\n")
     
     def gerador_func(self, instrucao, arq):
-        print("func {0}:\nbegin_func:".format(instrucao[2].lexema))
         arq.write("func {0}:\nbegin_func:".format(instrucao[2].lexema) + "\n")
 
     def gerador_proc(self, instrucao, arq):  
-        print("proc {0}:\nbegin_proc:".format(instrucao[1].lexema))
         arq.write("proc {0}:\nbegin_proc:".format(instrucao[1].lexema) + "\n")

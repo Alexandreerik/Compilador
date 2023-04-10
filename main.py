@@ -14,5 +14,5 @@ parser = AnalizadorSintatico(lexer.tokens, lexer.tabela_simbolos)
 instrucoes=parser.programa()
 
 gerador = GeradorCodigoIntermediario(instrucoes)
-gerador.imprimirListainstrucoes()
+#gerador.imprimirListainstrucoes()
 gerador.gerar_codigo()

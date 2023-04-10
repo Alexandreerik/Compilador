@@ -16,6 +16,7 @@ ifFalse j>i goto: L1
 
 print(i)
 
+L1:
 
 _t0 = j * k
 i = _t0
@@ -27,7 +28,7 @@ end_func
 ts = true 
 
 _t0 = 1 + 5
-_t1 = _t0 / 4
+_t1 = _t0 / 3
 _t2 = _t1 * 2
 x = _t2
 
@@ -48,6 +49,27 @@ whileFalse x<10 goto: L4
 _t0 = x * 3
 x = _t0
 
+ifFalse x>y goto: L5
+
 print(x)
 
+goto: L3
 
+goto: L6
+L5:
+
+print(x)
+
+goto: L4
+
+L6:
+
+goto: L3
+L4:
+
+goto: L2
+L3:
+
+_param = y 
+_param = x 
+call somador,2

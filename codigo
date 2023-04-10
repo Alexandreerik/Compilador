@@ -1,36 +1,38 @@
 program{
 
-func int soma (int i, int j) {
-int k = i + j ;
-i = j * k;
-return ( k );
-}
-
-int x = 1;
-int y = 5;
-
-int z = callfunc soma (x, y);
-while (x < 10){
-
-while (x < 5){
-    x = x * 3;
-}
-
-
-x = x + 1;
-if( x > y ){
-    print(x);
-break;
-}endif else{
-
-}
-
-}
-
 proc somador (int a, int b){
-print( a );
+    print(a);
+
 }
 
-callproc soma2 ( x , y);
+func int soma (int i, int j) {
+    int k = i + j ; 
+    if( j > i ){
+        print( i );
+
+    }endif
+    i = j * k;
+    return ( 3 );
+}
+
+bool ts = true;
+int x = 1 + 5 / 3 * 2;
+int y = 10;
+int z = callfunc soma (x , y);
+bool boleano = true;
+
+while (x < 100){
+    while (x < 10){
+        x = x * 3;
+        if( x > y ){
+            print(x + ts);
+            break;
+        }endif else{
+            continue;
+        } endelse
+  }endwhile
+} endwhile
+
+callproc somador (x, y);
 
 }end

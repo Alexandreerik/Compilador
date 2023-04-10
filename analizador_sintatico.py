@@ -60,7 +60,7 @@ class AnalizadorSintatico:
         self.match("<tipo>")
         self.match("<identificador>")    
         if (not verificar_declaracao(self.lista_tokens,self.tabela_simbolos,self.look_ahead)):
-            print("Erro semântico: variável ")
+            print("Erro semântico: variável na linha: " + str(self.lista_tokens[self.look_ahead-1].linha))
             exit()
         self.match("<atribuição>")
         self.atribuicao()
@@ -87,6 +87,14 @@ class AnalizadorSintatico:
         self.instrucoes.append(endProc)
 
      def chamada_procedimento(self):
+        look_ahead_aux = self.look_ahead
+        instrucao_aux = []
+
+        while self.lista_tokens[look_ahead_aux].nome != "<fim_comando>":
+            instrucao_aux.append(self.lista_tokens[look_ahead_aux])
+            look_ahead_aux += 1
+
+        self.instrucoes.append(instrucao_aux)
         self.match("<chamada de procedimento>")
         if(not verificar_parametros(self.lista_tokens,self.tabela_simbolos,self.look_ahead)):
             print("Erro semântico: procedimento ")
@@ -102,7 +110,7 @@ class AnalizadorSintatico:
             self.match("<palavraBooleana>")
         else:
             if (not verificar_expressao(self.lista_tokens,self.tabela_simbolos,self.look_ahead)):
-                print("Erro semântico: expressão ")
+                print("Erro semântico: expressão na linha: " + str(self.lista_tokens[self.look_ahead-1].linha))
                 exit()
             if self.lista_tokens[self.look_ahead].nome == "<identificador>":
                 self.match("<identificador>")
@@ -322,9 +330,10 @@ class AnalizadorSintatico:
         self.match("<abre_chaves>")
         self.bloco3()
         self.match("<fecha_chaves>")
-        self.match("<fim_if>")
         self.instrucoes.append([self.lista_tokens[self.look_ahead],self.lista_tokens[self.look_ahead]])
+        self.match("<fim_if>")
         if self.lista_tokens[self.look_ahead].nome == "<else_part>":
+            self.instrucoes.append([self.lista_tokens[self.look_ahead],self.lista_tokens[self.look_ahead]])
             self.match("<else_part>")
             self.match("<abre_chaves>")
             self.bloco3()
@@ -355,6 +364,7 @@ class AnalizadorSintatico:
             self.chamada_procedimento()
             self.bloco2()
         elif self.lista_tokens[self.look_ahead].nome == "<incondicional>":
+            self.instrucoes.append([self.lista_tokens[self.look_ahead],self.lista_tokens[self.look_ahead]])
             self.match("<incondicional>")
             self.match("<fim_comando>")
             self.bloco2()
@@ -363,6 +373,13 @@ class AnalizadorSintatico:
         
   
      def condicao2(self):
+        look_ahead_aux = self.look_ahead
+        instrucao_aux = []
+        while self.lista_tokens[look_ahead_aux].nome != "<abre_chaves>":
+            instrucao_aux.append(self.lista_tokens[look_ahead_aux])
+            look_ahead_aux += 1
+
+        self.instrucoes.append(instrucao_aux)
         self.match("<chamada do if>")
         self.match("<abre_parenteses>")
         self.expressao()
@@ -370,12 +387,16 @@ class AnalizadorSintatico:
         self.match("<abre_chaves>")
         self.bloco2()
         self.match("<fecha_chaves>")
+        if not self.lista_tokens[self.look_ahead+1].nome == "<else_part>":
+            self.instrucoes.append([self.lista_tokens[self.look_ahead],self.lista_tokens[self.look_ahead]])
         self.match("<fim_if>")
         if self.lista_tokens[self.look_ahead].nome == "<else_part>":
+            self.instrucoes.append([self.lista_tokens[self.look_ahead],self.lista_tokens[self.look_ahead]])
             self.match("<else_part>")
             self.match("<abre_chaves>")
             self.bloco2()
             self.match("<fecha_chaves>")
+            self.instrucoes.append([self.lista_tokens[self.look_ahead],self.lista_tokens[self.look_ahead]])
             self.match("<fim_else>")
         
 
