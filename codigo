@@ -25,10 +25,11 @@ while (x < 100){
     while (x < 10){
         x = x * 3;
         if( x > y ){
-            print(x + ts);
-            break;
-        }endif else{
+            print(x);
             continue;
+        }endif else{
+            print(x);
+            break;
         } endelse
   }endwhile
 } endwhile

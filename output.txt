@@ -12,7 +12,7 @@ begin_func:
 _t0 = i + j
 k = _t0
 
-ifFalse j>i goto: L1
+ifI j>k goto: L1
 
 print(i)
 
@@ -21,7 +21,7 @@ L1:
 _t0 = j * k
 i = _t0
 
-return 3
+return i
 
 end_func
 
@@ -29,7 +29,7 @@ ts = true
 
 _t0 = 1 + 5
 _t1 = _t0 / 3
-_t2 = _t1 * 2
+_t2 = _t1 * 4
 x = _t2
 
 y = 10 
@@ -41,31 +41,31 @@ z = call soma,2
 boleano = true 
 
 L2:
-whileFalse x<100 goto: L3
+ifW x<100 goto: L3
 
-L3:
-whileFalse x<10 goto: L4
+L4:
+ifW x<10 goto: L5
 
 _t0 = x * 3
 x = _t0
 
-ifFalse x>y goto: L5
-
-print(x)
-
-goto: L3
-
-goto: L6
-L5:
+ifI x>y goto: L6
 
 print(x)
 
 goto: L4
 
+goto: L7
 L6:
 
-goto: L3
-L4:
+print(x)
+
+goto: L5
+
+L7:
+
+goto: L4
+L5:
 
 goto: L2
 L3:

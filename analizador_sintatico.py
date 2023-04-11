@@ -60,7 +60,6 @@ class AnalizadorSintatico:
         self.match("<tipo>")
         self.match("<identificador>")    
         if (not verificar_declaracao(self.lista_tokens,self.tabela_simbolos,self.look_ahead)):
-            print("Erro semântico: variável na linha: " + str(self.lista_tokens[self.look_ahead-1].linha))
             exit()
         self.match("<atribuição>")
         self.atribuicao()
@@ -110,7 +109,6 @@ class AnalizadorSintatico:
             self.match("<palavraBooleana>")
         else:
             if (not verificar_expressao(self.lista_tokens,self.tabela_simbolos,self.look_ahead)):
-                print("Erro semântico: expressão na linha: " + str(self.lista_tokens[self.look_ahead-1].linha))
                 exit()
             if self.lista_tokens[self.look_ahead].nome == "<identificador>":
                 self.match("<identificador>")
@@ -164,7 +162,6 @@ class AnalizadorSintatico:
 
      def chamada_operador(self):
         if (not verificar_atribuicao(self.lista_tokens,self.tabela_simbolos,self.look_ahead)):
-            print("Erro semântico: atribuição ")
             exit()
         while True:
             if self.lista_tokens[self.look_ahead].nome == "<identificador>":

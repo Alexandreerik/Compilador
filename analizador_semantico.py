@@ -61,7 +61,7 @@ def verificar_declaracao(lista_tokens, tabela_simbolos, look_ahead):
         if(lista_tokens[look_ahead + 1].nome == "<palavraBooleana>"):
             return True
         elif(lista_tokens[look_ahead + 1].nome == "<identificador>"):
-            if(get_tipo(lista_tokens[look_ahead], tabela_simbolos) == "boolean"):
+            if(get_tipo(lista_tokens[look_ahead], tabela_simbolos) == "bool"):
                 return True
             else:
                 print('\033[91m' + "Erro semantico na linha: {0}, variable {1} has a different declaration".format(lista_tokens[look_ahead].linha, lista_tokens[look_ahead].lexema) + '\033[0m')
@@ -132,11 +132,11 @@ def verificar_retorno(lista_tokens, tabela_simbolos, look_ahead, posicao):
         else:
             print('\033[91m' + "Erro semantico na linha: {0}, expected int but receive boolean".format(lista_tokens[look_ahead + 2].linha) + '\033[0m')
             return False
-    elif(tabela_simbolos[lista_tokens[posicao].lexema].tipoRetorno == "boolean"):
+    elif(tabela_simbolos[lista_tokens[posicao].lexema].tipoRetorno == "bool"):
         if(lista_tokens[look_ahead + 2].nome == "<palavraBooleana>"):
             return True
         elif(lista_tokens[look_ahead + 2].nome == "<identificador>"):
-            if(get_tipo(lista_tokens[look_ahead + 2], tabela_simbolos) == "boolean"):
+            if(get_tipo(lista_tokens[look_ahead + 2], tabela_simbolos) == "bool"):
                 return True
             else:
                 print('\033[91m' + "Erro semantico na linha: {0}, variable {1} has a different declaration".format(lista_tokens[look_ahead + 2].linha, lista_tokens[look_ahead + 2].lexema) + '\033[0m')
@@ -146,24 +146,10 @@ def verificar_retorno(lista_tokens, tabela_simbolos, look_ahead, posicao):
             return False
 
 
-
-
-def verificar_int(lista_tokens, tabela_simbolos, look_ahead):
-    ultimo_valor = get_tipo(lista_tokens[look_ahead], tabela_simbolos)
-    if(ultimo_valor == "int"):
-        return True
-    elif(lista_tokens[look_ahead].nome == "<número>"):
-        return True
-    elif(not ultimo_valor): ## olhar depois se está correto
-        return True
-    else:
-        print('\033[91m' + "Erro semantico na linha: {0}, expected int but receive boolean".format(lista_tokens[look_ahead].linha) + '\033[0m')
-        return False
     
 def verificar_expressao(lista_tokens, tabela_simbolos, look_ahead):
     primeiro_valor = get_tipo(lista_tokens[look_ahead], tabela_simbolos)
     segundo_valor = get_tipo(lista_tokens[look_ahead + 2], tabela_simbolos)
-    
     if(primeiro_valor == segundo_valor):
         return True
     elif(primeiro_valor == "int" and lista_tokens[look_ahead + 2].nome == "<número>"):
@@ -171,6 +157,7 @@ def verificar_expressao(lista_tokens, tabela_simbolos, look_ahead):
     elif(lista_tokens[look_ahead].nome == "<número>" and segundo_valor == "int"):
         return True
     else:
+        print('\033[91m' + "Erro semantico na linha: {0}, expected int but receive boolean".format(lista_tokens[look_ahead].linha) + '\033[0m')
         return False
 
 

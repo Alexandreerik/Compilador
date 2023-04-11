@@ -3,9 +3,9 @@ from TokenDaGramatica import token
 class GeradorCodigoIntermediario:
     def __init__(self, lista_instrucoes):
         self.lista_instrucoes = lista_instrucoes
-        self.labels = 0
-        self.lastLabelWhile = []
-        self.labelsElse = []
+        self.rotulos = 0
+        self.rotulos_while = []
+        self.rotulos_if = []
         
     def imprimirListainstrucoes(self):
         for i in range(len(self.lista_instrucoes)):
@@ -96,25 +96,25 @@ class GeradorCodigoIntermediario:
                 if item.lexema not in ["if","(",")"]:
                     listAux.append(item)
             
-            self.labels += 1
-            arq.write("ifFalse ")
+            self.rotulos += 1
+            arq.write("ifI ")
 
             for item in listAux:
                 arq.write(item.lexema + "")
 
-            if len(self.lastLabelWhile) != 0:
-                self.labels += 1 
-            arq.write(" goto: L{0}".format(self.labels) + "\n")
+            if len(self.rotulos_while) != 0:
+                self.rotulos += 1 
+            arq.write(" goto: L{0}".format(self.rotulos) + "\n")
             
-            self.labelsElse.append(self.labels)
+            self.rotulos_if.append(self.rotulos)
         elif(instrucao[0].lexema == "else"):
-            pop = self.labelsElse.pop()
-            arq.write("goto: L{0}".format(self.labels + 1) + "\n")
+            pop = self.rotulos_if.pop()
+            arq.write("goto: L{0}".format(self.rotulos + 1) + "\n")
             arq.write("L{0}:".format(pop) + "\n")
-            self.labelsElse.append(self.labels + 1)
+            self.rotulos_if.append(self.rotulos + 1)
         else:
             
-            pop = self.labelsElse.pop()
+            pop = self.rotulos_if.pop()
             arq.write("L{0}:".format(pop) + "\n")
 
 
@@ -124,24 +124,26 @@ class GeradorCodigoIntermediario:
             for item in instrucao:
                 if item.lexema not in ["while","(",")"]:
                     listAux.append(item)
-
-            self.labels += 1
-            self.lastLabelWhile.append(self.labels)
-            arq.write("L{0}:".format(self.labels) + "\n")
-            arq.write("whileFalse ")
+            if len(self.rotulos_while) % 2 == 0:
+                self.rotulos += 1
+            else:
+                self.rotulos += 2
+            self.rotulos_while.append(self.rotulos)
+            arq.write("L{0}:".format(self.rotulos) + "\n")
+            arq.write("ifW ")
             for item in listAux: 
                 arq.write(item.lexema + "")
-            arq.write(" goto: L{0}".format(self.labels + 1) + "\n")
+            arq.write(" goto: L{0}".format(self.rotulos + 1) + "\n")
         elif(instrucao[0].lexema == "break"):
-            pop = self.lastLabelWhile.pop()
+            pop = self.rotulos_while.pop()
             arq.write("goto: L{0}".format(pop + 1) + "\n")
-            self.lastLabelWhile.append(pop)
+            self.rotulos_while.append(pop)
         elif(instrucao[0].lexema == "continue"):
-            pop = self.lastLabelWhile.pop()
+            pop = self.rotulos_while.pop()
             arq.write("goto: L{0}".format(pop) + "\n")
-            self.lastLabelWhile.append(pop)
+            self.rotulos_while.append(pop)
         else:
-            pop = self.lastLabelWhile.pop()
+            pop = self.rotulos_while.pop()
             arq.write("goto: L{0}".format(pop) + "\n")
             arq.write("L{0}:".format(pop + 1) + "\n")
     
